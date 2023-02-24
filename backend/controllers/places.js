@@ -93,6 +93,31 @@ router.post('/:placeId/comments', async (req, res) => {
     if (!place) {
         res.status(404).json({ message: `Could not find place with id "${placeId}"` })
     }
+    if (!req.currentUser) {
+        return res.status(404).json({ message: `You must be logged in to leave a rand or rave.` })
+    }
+
+    const comment = await Comment.create({
+        ...req.body,
+        authorId: req.currentUser.userId,
+        placeId: placeId
+    })
+
+    res.send({
+        ...comment.toJSON(),
+        author: req.currentUser
+    })
+})
+    let currentUser;
+    try {
+        currentUser = await User.findOne({
+            where: {
+                userId: req.session.userId
+            }
+        })
+    } catch {
+        currentUser = null;
+    }
 
     const author = await User.findOne({
         where: { userId: req.body.authorId }
@@ -102,8 +127,16 @@ router.post('/:placeId/comments', async (req, res) => {
         res.status(404).json({ message: `Could not find author with id "${req.body.authorId}"` })
     }
 
+  
+    if (!currentUser) {
+        return res.status(404).json({
+            message: `You must be logged in to leave a rand or rave.`
+        })
+    }
+
     const comment = await Comment.create({
         ...req.body,
+        authorId: currentUser.userId,
         placeId: placeId
     })
 
@@ -111,7 +144,7 @@ router.post('/:placeId/comments', async (req, res) => {
         ...comment.toJSON(),
         author
     })
-})
+
 
 router.delete('/:placeId/comments/:commentId', async (req, res) => {
     let placeId = Number(req.params.placeId)

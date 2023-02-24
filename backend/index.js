@@ -5,6 +5,9 @@ const bodyParser = require('body-parser')
 const cors = require('cors')
 const app = express();
 const cookieSession = require('cookie-session')
+const defineCurrentUser = require('./middleware/')
+
+
 
 // Express Settings
 app.use(cookieSession({
@@ -19,6 +22,8 @@ app.use(cors({
 app.use(express.static('public'))
 app.use(express.urlencoded({ extended: true }))
 app.use(bodyParser.json())
+app.use(defineCurrentUser)
+app.use('/authentication', require('./controllers/authentication'))
 
 // Controllers & Routes
 

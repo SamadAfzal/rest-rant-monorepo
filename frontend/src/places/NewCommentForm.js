@@ -3,14 +3,7 @@ import { useHistory } from "react-router"
 
 function NewCommentForm({ place, onSubmit }) {
 
-    const [authors, setAuthors] = useState([])
 
-    const [comment, setComment] = useState({
-        content: '',
-        stars: 3,
-        rant: false,
-        authorId: ''
-    })
 
     useEffect(() => {
         const fetchData = async () => {
